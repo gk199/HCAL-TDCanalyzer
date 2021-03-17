@@ -1,0 +1,9 @@
+<use name="root"/>
+<use name="rootinteractive"/>
+<use name="DataFormats/HcalDetId"/>
+<environment>
+  <bin file="2018_HE_TDC.cxx" name="2018_HE_TDC.exe"/>
+  <bin file="RechitTDC.cxx" name="RechitTDC.exe"/>
+  <bin file="ExtendedBits.cxx" name="ExtendedBits.exe"/>  
+</environment>
+<flags CXXFLAGS="-Wall -Werror -g -lTreePlayer"/>

@@ -1,0 +1,11 @@
+executable            = runjobs.sh
+Proxy_path            = /afs/cern.ch/user/g/gkopp/x509up_u101898
+arguments             = $(Proxy_path) /afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/python/ConfFile_cfg.py
+output                = /afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/out/IsoBunch.out
+error                 = /afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/error/IsoBunch.err
+log                   = /afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/log/IsoBunch.log
+
++JobFlavour = "testmatch"
+RequestCpus = 4
+
+queue
