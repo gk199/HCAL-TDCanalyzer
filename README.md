@@ -27,10 +27,10 @@ cmsRun analyze_339479.py
 ```
 This is taken from the [HCAL debug framework](https://github.com/gk199/cms-hcal-debug) with more details on the github page. Running the python config will then output a Root file `analyze*.root`, with the extended bits stored. To understand the info in this file, use `HcalDigiAnalyzer-2018RAW/MyAnalyzer/bin/ExtendedBits.cxx`. This reads in the `analyze*.root` file, and running as an executable (`ExtendedBits.exe`) will print the extended bits for an event of interest.
 
-Ideally we'd like to cross-correlate this with the fine-grain bits, but the current MWGR used don't have HB values processed. This approach uses MWGR cosmics (RAW data) [https://cmsweb.cern.ch/das/request?input=file+dataset%3D%2FCosmics%2FCommissioning2021-v1%2FRAW&instance=prod/global&amp;idx=50&&amp;limit=50].
+Ideally we'd like to cross-correlate this with the fine-grain bits, but the current MWGR used don't have HB values processed. This approach uses MWGR cosmics [RAW data](https://cmsweb.cern.ch/das/request?input=file+dataset%3D%2FCosmics%2FCommissioning2021-v1%2FRAW&instance=prod/global&amp;idx=50&&amp;limit=50).
 
 ## MWGR TDC -- fine grain bits
-Starting from the MWGR Cosmics run (as above, but now using the (RAW-RECO data)[https://cmsweb.cern.ch/das/request?instance=prod/global&input=file+dataset%3D%2FCosmics%2FCommissioning2021-CosmicTP-PromptReco-v1%2FRAW-RECO]), the TDC fine grain bits can be looked at. This is done in `HcalDigiAnalyzer-2018RAW/MyAnalyzer/bin/RechHit.cxx` and `RechHit.exe`, where the TDC value (packed in HB, so is 0, 1, 2, or 3; or 0-63 in HE), time slice, event, and ieta are printed out. 
+Starting from the MWGR Cosmics run (as above, but now using the [RAW-RECO data](https://cmsweb.cern.ch/das/request?instance=prod/global&input=file+dataset%3D%2FCosmics%2FCommissioning2021-CosmicTP-PromptReco-v1%2FRAW-RECO)), the TDC fine grain bits can be looked at. This is done in `HcalDigiAnalyzer-2018RAW/MyAnalyzer/bin/RechHit.cxx` and `RechHit.exe`, where the TDC value (packed in HB, so is 0, 1, 2, or 3; or 0-63 in HE), time slice, event, and ieta are printed out. 
 
 For simplicity, a single RAW-RECO file is copied locally to run over:
 ```
@@ -51,4 +51,4 @@ https://cmssdt.cern.ch/lxr/source/DataFormats/HcalDigi/interface/QIE11DataFrame.
 
 For looking at RAW and RAW-RECO data, using the "parent-child" relationship tracing on DAS is helpful to see which files are processed to later data tiers.
 
-Studies by others to reference: 2018 HE TDC studies from Long -- (first)[https://indico.cern.ch/event/944874/contributions/3970495/attachments/2094462/3524649/TDCdatavsmc.pdf], (second)[https://indico.cern.ch/event/961080/contributions/4042712/attachments/2114609/3557646/TDCdatavsmc2.pdf]. Michael Krohn's (extended bits)[https://indico.cern.ch/event/995767/contributions/4184636/attachments/2176494/3675363/HCAL_L1FeatureBits_MWGR3_RemoveMixedModules.pdf].
+Studies by others to reference: 2018 HE TDC studies from Long -- [first](https://indico.cern.ch/event/944874/contributions/3970495/attachments/2094462/3524649/TDCdatavsmc.pdf), [second](https://indico.cern.ch/event/961080/contributions/4042712/attachments/2114609/3557646/TDCdatavsmc2.pdf). Michael Krohn's [extended bits](https://indico.cern.ch/event/995767/contributions/4184636/attachments/2176494/3675363/HCAL_L1FeatureBits_MWGR3_RemoveMixedModules.pdf).
