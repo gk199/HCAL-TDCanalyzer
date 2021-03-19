@@ -37,66 +37,77 @@ int main(int argc, char *argv[]) {
   TTreeReaderValue<Float_t> iPhi(myReader, "IPhi");
   TTreeReaderValue<Float_t> Depth(myReader, "Depth");
 
-  TCanvas* c1 = new TCanvas("c1","TDC Distribution, 2018D",0,0,400,300);
-  gStyle->SetOptStat(0);
-  TH1F* depth1 = new TH1F("depth1","HE Depth 1",50,0,49);
-  TH1F* depth2 = new TH1F("depth2","HE Depth 2",50,0,49);
-  TH1F* depth3 = new TH1F("depth3","HE Depth 3",50,0,49);
-  TH1F* depth4 = new TH1F("depth4","HE Depth 4",50,0,49);
-  TH1F* depth5 = new TH1F("depth5","HE Depth 5",50,0,49);
-  TH1F* depth6 = new TH1F("depth6","HE Depth 6",50,0,49);
-  TH1F* depth7 = new TH1F("depth7","HE Depth 7",50,0,49);
-
-  TH1F* depth2_ieta = new TH1F("depth2_ieta","HE Depth 2 by ieta",16,15,30);
+  std::map<int, TH1F*> depth_all_ieta; // histogram for TDC at each depth
+  std::map<int, std::map<int, TH1F*>> depth_by_ieta; // histogram for TDC at each depth and ieta
+  for (int depth = 1; depth <= 7; depth ++) {
+    depth_all_ieta[depth] = new TH1F(Form("depth_all_ieta_%d",depth),Form("HE Depth %d",depth), 50,0,49);
+    for (int ieta = 16; ieta < 30; ieta ++) depth_by_ieta[depth][ieta] = new TH1F(Form("depth%d_ieta%d",depth, ieta), Form("HE Depth %d, ieta %d", depth, ieta), 50,0,49);
+  }
 
   gROOT->SetObjectStat(0);
 
   int evtCounter = 1;
   while (myReader.Next()) {
-    if ( abs(*iEta) > 30 ) continue; // don't consider HF
+    if ( abs(*iEta) >= 30 ) continue; // don't consider HF
     if ( *Charge > 7000 && *ADC > 50) { // about 3 GeV, this is the charge for the full digi pulse shape
-      if (*Depth == 1) depth1->Fill(*TDC1);
-      if (*Depth == 2) depth2->Fill(*TDC1);
-      if (*Depth == 3) depth3->Fill(*TDC1);
-      if (*Depth == 4) depth4->Fill(*TDC1);
-      if (*Depth == 5) depth5->Fill(*TDC1);
-      if (*Depth == 6) depth6->Fill(*TDC1);
-      if (*Depth == 7) depth7->Fill(*TDC1);
-      
-      //      if (*Depth == 2) 
+      depth_all_ieta[*Depth]->Fill(*TDC1);
+      depth_by_ieta[*Depth][abs(*iEta)]->Fill(*TDC1);
     }
     evtCounter++;
   }
-  depth1->SetLineColor(kRed);
-  depth2->SetLineColor(kGreen);
-  depth3->SetLineColor(kTeal);
-  depth4->SetLineColor(kBlue);
-  depth5->SetLineColor(kGray);
-  depth6->SetLineColor(kBlack);
-  depth7->SetLineColor(kOrange);
 
-  depth1->Draw();
-  depth2->Draw("same");
-  depth3->Draw("same");
-  depth4->Draw("same");
-  depth5->Draw("same");
-  depth6->Draw("same");
-  depth7->Draw("same");
-
-  TLegend* leg = new TLegend(0.55,0.6,0.9,0.9);
-  leg->AddEntry(depth1,Form("HE Depth 1, mean =%.2f",depth1->GetMean()));
-  leg->AddEntry(depth2,Form("HE Depth 2, mean =%.2f",depth2->GetMean()));
-  leg->AddEntry(depth3,Form("HE Depth 3, mean =%.2f",depth3->GetMean()));
-  leg->AddEntry(depth4,Form("HE Depth 4, mean =%.2f",depth4->GetMean()));
-  leg->AddEntry(depth5,Form("HE Depth 5, mean =%.2f",depth5->GetMean()));
-  leg->AddEntry(depth6,Form("HE Depth 6, mean =%.2f",depth6->GetMean()));
-  leg->AddEntry(depth7,Form("HE Depth 7, mean =%.2f",depth7->GetMean()));
+  TCanvas* c1 = new TCanvas("c1","TDC Distribution, 2018D",0,0,400,300);
+  gStyle->SetOptStat(0);
+  TLegend* leg = new TLegend(0.5,0.6,0.9,0.9);
+  depth_all_ieta[1]->Draw();
+  for (int depth = 1; depth <= 7; depth++) 
+    {
+      depth_all_ieta[depth]->SetLineColor(kRainBow+depth*6);
+      //      depth_all_ieta[depth]->Scale(1./depth_all_ieta[depth]->Integral()); // normalize histograms
+      depth_all_ieta[depth]->Draw("same");
+      leg->AddEntry(depth_all_ieta[depth],Form("HE Depth %d, mean = %.2f",depth,depth_all_ieta[depth]->GetMean()));
+    }
   leg->Draw("same");
-  //  gPad->BuildLegend();
-  depth1->SetTitle("TDC Distribution, 2018D");
-  depth1->GetXaxis()->SetTitle("TDC value in SOI, 1/2 ns steps");
-  depth1->GetYaxis()->SetTitle("Entries");
+  depth_all_ieta[1]->SetTitle("TDC Distribution, 2018D");   
+  depth_all_ieta[1]->GetXaxis()->SetTitle("TDC value in SOI, 1/2 ns steps");
+  depth_all_ieta[1]->GetYaxis()->SetTitle("Entries");
+
   c1->SaveAs("TDC_by_depth.pdf");
+  c1->SetLogy();
+  c1->SaveAs("TDC_by_depth_log.pdf");
 
-
+  TCanvas* c2 = new TCanvas("c2","TDC Distribution, 2018D",0,0,400,300);
+  gStyle->SetOptStat(0);
+  TLegend* leg2 = new TLegend(0.5,0.6,0.9,0.9);
+  for (int ieta = 16; ieta < 30; ieta++) {
+    if (ieta == 16) depth_by_ieta[4][ieta]->Draw();
+    if (ieta == 17 || ieta == 18) depth_by_ieta[2][ieta]->Draw();
+    if (ieta > 18) depth_by_ieta[1][ieta]->Draw();
+    for (int depth = 1; depth <= 7; depth++)
+      {
+	depth_by_ieta[depth][ieta]->SetLineColor(kRainBow+depth*6);
+	depth_by_ieta[depth][ieta]->Draw("same");
+	leg2->AddEntry(depth_by_ieta[depth][ieta],Form("HE Depth %d, mean = %.2f",depth,depth_by_ieta[depth][ieta]->GetMean()));
+      }
+    leg2->Draw("same");
+    depth_by_ieta[1][ieta]->SetTitle(Form("TDC Distribution at ieta = %d, 2018D",ieta));
+    depth_by_ieta[1][ieta]->GetXaxis()->SetTitle("TDC value in SOI, 1/2 ns steps");
+    depth_by_ieta[1][ieta]->GetYaxis()->SetTitle("Entries");
+    if (ieta ==16) {
+      depth_by_ieta[4][ieta]->SetTitle(Form("TDC Distribution at ieta = %d, 2018D",ieta));
+      depth_by_ieta[4][ieta]->GetXaxis()->SetTitle("TDC value in SOI, 1/2 ns steps");
+      depth_by_ieta[4][ieta]->GetYaxis()->SetTitle("Entries");
+    }
+    if (ieta == 17 || ieta == 18) {
+      depth_by_ieta[2][ieta]->SetTitle(Form("TDC Distribution at ieta = %d, 2018D",ieta));
+      depth_by_ieta[2][ieta]->GetXaxis()->SetTitle("TDC value in SOI, 1/2 ns steps");
+      depth_by_ieta[2][ieta]->GetYaxis()->SetTitle("Entries");    
+    }
+    c2->SaveAs(Form("TDC_by_depth_ieta%d.pdf",ieta));
+    c2->SetLogy();
+    c2->SaveAs(Form("TDC_by_depth_ieta%d_log.pdf",ieta));
+    c2->Clear();
+    c2->SetLogy(0);
+    leg2->Clear();
+  }
 }
