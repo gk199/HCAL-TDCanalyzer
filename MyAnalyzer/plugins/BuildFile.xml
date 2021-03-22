@@ -1,0 +1,9 @@
+<use name="CommonTools/UtilAlgos"/>
+<use name="DataFormats/HcalDetId"/>
+<use name="DataFormats/HcalDigi"/>
+<use name="DataFormats/HcalRecHit"/>
+<use name="CalibFormats/HcalObjects"/>
+<use name="FWCore/Framework"/>
+<use name="FWCore/ParameterSet"/>
+<use name="FWCore/PluginManager"/>
+<flags EDM_PLUGIN="1"/>
