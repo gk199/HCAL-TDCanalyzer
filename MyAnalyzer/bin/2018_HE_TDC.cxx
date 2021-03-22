@@ -46,6 +46,8 @@ int main(int argc, char *argv[]) {
 
   gROOT->SetObjectStat(0);
 
+  int eta_depth_tdc[30][8][51] = {{{0}}};
+
   int evtCounter = 1;
   while (myReader.Next()) {
     if ( abs(*iEta) >= 30 ) continue; // don't consider HF
@@ -53,6 +55,7 @@ int main(int argc, char *argv[]) {
       depth_all_ieta[*Depth]->Fill(*TDC1);
       depth_by_ieta[*Depth][abs(*iEta)]->Fill(*TDC1);
     }
+    if ( *ADC > 33) eta_depth_tdc[static_cast<int>(abs(*iEta))][static_cast<int>(*Depth)][static_cast<int>(*TDC1)] += 1; // at each ieta, depth, count how many cells with TDC of each value
     evtCounter++;
   }
 
@@ -93,7 +96,7 @@ int main(int argc, char *argv[]) {
     depth_by_ieta[1][ieta]->SetTitle(Form("TDC Distribution at ieta = %d, 2018D",ieta));
     depth_by_ieta[1][ieta]->GetXaxis()->SetTitle("TDC value in SOI, 1/2 ns steps");
     depth_by_ieta[1][ieta]->GetYaxis()->SetTitle("Entries");
-    if (ieta ==16) {
+    if (ieta == 16) {
       depth_by_ieta[4][ieta]->SetTitle(Form("TDC Distribution at ieta = %d, 2018D",ieta));
       depth_by_ieta[4][ieta]->GetXaxis()->SetTitle("TDC value in SOI, 1/2 ns steps");
       depth_by_ieta[4][ieta]->GetYaxis()->SetTitle("Entries");
@@ -110,4 +113,35 @@ int main(int argc, char *argv[]) {
     c2->SetLogy(0);
     leg2->Clear();
   }
+
+  // calculate partial sum / cumulative sum from the TDC distributions
+  double sum[30][8] = {{0}}; // indexed by eta, depth
+  double partial_sum[30][8][51] = {{{0}}}; // counts partial sum up to each tdc value
+  double cumulative_frac[30][8][51] = {{{0}}};
+
+  for (int eta = 0; eta < 30; eta++) {
+    for (int depth = 1; depth < 8; depth++) {
+      for (int tdc = 0; tdc<=50; tdc++) {
+	sum[eta][depth] += eta_depth_tdc[eta][depth][tdc];
+	partial_sum[eta][depth][tdc] = sum[eta][depth];
+      }
+    }
+  }
+  std::cout << partial_sum[0][1][50] << std::endl;
+
+  int bkg90[30][8] = {{0}};
+  for (int eta = 0; eta < 30; eta++) {
+    for (int depth = 1; depth < 8; depth++) {
+      for (int tdc = 0; tdc<=50; tdc++) {
+	cumulative_frac[eta][depth][tdc] = (double) ( partial_sum[eta][depth][tdc] / partial_sum[eta][depth][50] );
+	if (cumulative_frac[eta][depth][tdc] > 0.9 && bkg90[eta][depth] == 0 ) bkg90[eta][depth] = tdc;
+	if (eta == 16 && depth == 5) std::cout << cumulative_frac[eta][depth][tdc] << " depth 2 at TDC = " << tdc << " with ps = " << partial_sum[eta][depth][tdc] << std::endl;
+      }
+    }
+  }
+  std::ofstream TDCdistribution_Background90;
+  TDCdistribution_Background90.open("TDCdistribution_Background90.txt");
+  for (int eta = 0; eta < 30; eta++) TDCdistribution_Background90 << eta << ", " << bkg90[eta][1] << ", " << bkg90[eta][2] << ", " << bkg90[eta][3] << ", " << bkg90[eta][4] << ", " << bkg90[eta][5] << ", " << bkg90[eta][6] << ", " << bkg90[eta][7] << std::endl;
+  TDCdistribution_Background90.close();
+
 }
