@@ -23,7 +23,7 @@
 #include "DataFormats/HcalRecHit/interface/HBHERecHit.h"
 
 int main(int argc, char *argv[]) {
-  TFile *f = new TFile("/afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/IsoBunch_Run2018D.root");
+  TFile *f = new TFile("/afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/IsoBunch_Run2018A.root");
 
   TTreeReader myReader("MyAnalyzer/qiedigi",f);
 
@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     evtCounter++;
   }
 
-  TCanvas* c1 = new TCanvas("c1","TDC Distribution, 2018D",0,0,400,300);
+  TCanvas* c1 = new TCanvas("c1","TDC Distribution, 2018A",0,0,400,300);
   gStyle->SetOptStat(0);
   TLegend* leg = new TLegend(0.5,0.6,0.9,0.9);
   depth_all_ieta[1]->Draw();
@@ -71,15 +71,15 @@ int main(int argc, char *argv[]) {
       leg->AddEntry(depth_all_ieta[depth],Form("HE Depth %d, mean = %.2f",depth,depth_all_ieta[depth]->GetMean()));
     }
   leg->Draw("same");
-  depth_all_ieta[1]->SetTitle("TDC Distribution, 2018D");   
+  depth_all_ieta[1]->SetTitle("TDC Distribution, 2018A");   
   depth_all_ieta[1]->GetXaxis()->SetTitle("TDC value in SOI, 1/2 ns steps");
   depth_all_ieta[1]->GetYaxis()->SetTitle("Entries");
 
-  c1->SaveAs("TDC_by_depth.pdf");
+  c1->SaveAs("2018A_plots/TDC_by_depth.pdf");
   c1->SetLogy();
-  c1->SaveAs("TDC_by_depth_log.pdf");
+  c1->SaveAs("2018A_plots/TDC_by_depth_log.pdf");
 
-  TCanvas* c2 = new TCanvas("c2","TDC Distribution, 2018D",0,0,400,300);
+  TCanvas* c2 = new TCanvas("c2","TDC Distribution, 2018A",0,0,400,300);
   gStyle->SetOptStat(0);
   TLegend* leg2 = new TLegend(0.5,0.6,0.9,0.9);
   for (int ieta = 16; ieta < 30; ieta++) {
@@ -93,22 +93,22 @@ int main(int argc, char *argv[]) {
 	leg2->AddEntry(depth_by_ieta[depth][ieta],Form("HE Depth %d, mean = %.2f",depth,depth_by_ieta[depth][ieta]->GetMean()));
       }
     leg2->Draw("same");
-    depth_by_ieta[1][ieta]->SetTitle(Form("TDC Distribution at ieta = %d, 2018D",ieta));
+    depth_by_ieta[1][ieta]->SetTitle(Form("TDC Distribution at ieta = %d, 2018A",ieta));
     depth_by_ieta[1][ieta]->GetXaxis()->SetTitle("TDC value in SOI, 1/2 ns steps");
     depth_by_ieta[1][ieta]->GetYaxis()->SetTitle("Entries");
     if (ieta == 16) {
-      depth_by_ieta[4][ieta]->SetTitle(Form("TDC Distribution at ieta = %d, 2018D",ieta));
+      depth_by_ieta[4][ieta]->SetTitle(Form("TDC Distribution at ieta = %d, 2018A",ieta));
       depth_by_ieta[4][ieta]->GetXaxis()->SetTitle("TDC value in SOI, 1/2 ns steps");
       depth_by_ieta[4][ieta]->GetYaxis()->SetTitle("Entries");
     }
     if (ieta == 17 || ieta == 18) {
-      depth_by_ieta[2][ieta]->SetTitle(Form("TDC Distribution at ieta = %d, 2018D",ieta));
+      depth_by_ieta[2][ieta]->SetTitle(Form("TDC Distribution at ieta = %d, 2018A",ieta));
       depth_by_ieta[2][ieta]->GetXaxis()->SetTitle("TDC value in SOI, 1/2 ns steps");
       depth_by_ieta[2][ieta]->GetYaxis()->SetTitle("Entries");    
     }
-    c2->SaveAs(Form("TDC_by_depth_ieta%d.pdf",ieta));
+    c2->SaveAs(Form("2018A_plots/TDC_by_depth_ieta%d.pdf",ieta));
     c2->SetLogy();
-    c2->SaveAs(Form("TDC_by_depth_ieta%d_log.pdf",ieta));
+    c2->SaveAs(Form("2018A_plots/TDC_by_depth_ieta%d_log.pdf",ieta));
     c2->Clear();
     c2->SetLogy(0);
     leg2->Clear();
