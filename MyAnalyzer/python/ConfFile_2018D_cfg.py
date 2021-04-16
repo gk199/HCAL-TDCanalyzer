@@ -22,11 +22,11 @@ process.load("RecoLocalTracker.SiPixelRecHits.SiPixelRecHits_cfi")
 
 process.source = cms.Source("PoolSource",
         fileNames = cms.untracked.vstring(
-#		'file:../../out_pions.root'
-#		'file:/afs/cern.ch/work/l/lowang/TDC_scan/CMSSW_11_2_X_2020-08-30-2300/src/HcalDPG/10824.0_TTbar_13+2018+TTbar_13TeV_TuneCUETP8M1_GenSim+Digi+Reco+HARVEST+ALCA+Nano/step2.root'
-#		'/store/data/Run2018D/JetHT/RAW/v1/000/323/415/00000/87BF31D2-301F-EF47-9268-14B1B258F441.root'
-#		'file:/afs/cern.ch/work/l/lowang/TDC_scan/CMSSW_11_2_X_2020-08-30-2300/src/HcalDPG/11024.0_TTbar_13+2018PU+TTbar_13TeV_TuneCUETP8M1_GenSim+DigiPU+RecoPU+HARVESTPU+Nano/step3.root'
-#		'file:/afs/cern.ch/work/l/lowang/TDC_scan/CMSSW_11_2_X_2020-08-30-2300/src/step3.root'
+                '/store/data/Run2018D/IsolatedBunch/RAW/v1/000/320/995/00000/16419319-8B9A-E811-8F80-FA163EE5B1AD.root',
+                '/store/data/Run2018D/IsolatedBunch/RAW/v1/000/320/995/00000/38E30EE2-829A-E811-8FFF-FA163E756520.root',
+                '/store/data/Run2018D/IsolatedBunch/RAW/v1/000/320/995/00000/4ADEEFD5-829A-E811-811D-FA163EE50654.root',
+                '/store/data/Run2018D/IsolatedBunch/RAW/v1/000/320/995/00000/5842D7D1-829A-E811-ADBF-FA163E4055E5.root',
+                '/store/data/Run2018D/IsolatedBunch/RAW/v1/000/320/996/00000/36572C99-919A-E811-8CA4-A4BF0112BD52.root',
 		'/store/data/Run2018D/IsolatedBunch/RAW/v1/000/320/995/00000/5E24D816-829A-E811-AD7D-FA163E517117.root',
 		'/store/data/Run2018D/IsolatedBunch/RAW/v1/000/324/729/00000/F4320861-24A3-C943-B04B-32241C65B880.root',
 		'/store/data/Run2018D/IsolatedBunch/RAW/v1/000/324/729/00000/ED53AAF9-6F71-1945-AE36-FC40CA6E79D8.root',
@@ -34,6 +34,7 @@ process.source = cms.Source("PoolSource",
 		'/store/data/Run2018D/IsolatedBunch/RAW/v1/000/324/729/00000/3EBE1EE2-546F-9A43-A5D4-37852227D0BB.root',
 		'/store/data/Run2018D/IsolatedBunch/RAW/v1/000/324/729/00000/2B4B4F1E-3FA9-9143-B3B3-A2AEE61BFE4B.root',
 		'/store/data/Run2018D/IsolatedBunch/RAW/v1/000/320/996/00000/EC3A47DE-9C9A-E811-A41A-FA163EF4E3E9.root',
+                '/store/data/Run2018D/IsolatedBunch/RAW/v1/000/323/416/00000/DD79DB8A-6E4F-594F-B679-941C4D198E2D.root',
 		'/store/data/Run2018D/IsolatedBunch/RAW/v1/000/320/996/00000/D4FFBD2E-A19A-E811-A2D9-FA163EF2167E.root',
 		'/store/data/Run2018D/IsolatedBunch/RAW/v1/000/320/996/00000/C097176A-979A-E811-98E7-02163E01A14D.root',
 		'/store/data/Run2018D/IsolatedBunch/RAW/v1/000/320/996/00000/3E34367C-A19A-E811-B221-FA163E2FE8B3.root',
@@ -68,7 +69,7 @@ process.MyAnalyzer = cms.EDAnalyzer('MyAnalyzer',
 )
 
 process.TFileService = cms.Service("TFileService",
-      fileName = cms.string("IsoBunch_Run2018D.root"),
+      fileName = cms.string("IsoBunch_Run2018D_bx.root"),
       closeFileFast = cms.untracked.bool(True)
 )
 
