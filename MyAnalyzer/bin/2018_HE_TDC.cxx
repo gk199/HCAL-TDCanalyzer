@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
   TTreeReaderValue<Float_t> Run(myReader, "RunNum");
   TTreeReaderValue<Float_t> Lumi(myReader, "LumiNum");
   TTreeReaderValue<Float_t> Event(myReader, "EvtNum");
+  TTreeReaderValue<Float_t> BunchX(myReader, "BunchCorssing");
   TTreeReaderValue<Float_t> ADC(myReader, "ADC");
   TTreeReaderValue<Float_t> Charge(myReader, "Charge");
   TTreeReaderValue<Float_t> TDC1(myReader, "TDC1");
