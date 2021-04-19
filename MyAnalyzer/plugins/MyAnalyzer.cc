@@ -101,7 +101,7 @@ MyAnalyzer::MyAnalyzer(const edm::ParameterSet& iConfig)
   usesResource("TFileService");
   edm::Service<TFileService> fs;
   tup_rh = fs->make<TNtuple>("rechit", "rechit", "RunNum:LumiNum:EvtNum:Energy:Time:TDC0:TDC1:TDC2:TDC3:TDC4:IEta:IPhi:Depth");
-  tup_qie= fs->make<TNtuple>("qiedigi", "qiedigi", "RunNum:LumiNum:EvtNum:BunchCrossing:ADC:Charge:TDC0:TDC1:TDC2:TDC3:TDC4:IEta:IPhi:Depth:TCharge:TADC");
+  tup_qie= fs->make<TNtuple>("qiedigi", "qiedigi", "RunNum:LumiNum:EvtNum:BunchCrossing:ADC:Charge:TDC0:TDC1:TDC2:TDC3:IEta:IPhi:Depth:TCharge:TADC");
 
 }
 
@@ -123,7 +123,7 @@ void MyAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   long runid   = iEvent.id().run();
   long eventid = iEvent.id().event();
   long lumiid  = iEvent.id().luminosityBlock();
-  long bunchx  = iEvent.id().bunchCrossing();
+  long bunchx  = iEvent.bunchCrossing();
 
   edm::ESHandle<HcalDbService> conditions;
   iSetup.get<HcalDbRecord>().get(conditions);
@@ -203,7 +203,7 @@ void MyAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       }
     }
 
-    tup_qie->Fill(runid, lumiid, eventid, bunchx, ADC_, charge_, digi[2].tdc(), digi[3].tdc(), digi[4].tdc(), digi[5].tdc(), digi[6].tdc(), did.ieta(), did.iphi(), did.depth(), TCharge, TADC);
+    tup_qie->Fill(runid, lumiid, eventid, bunchx, ADC_, charge_, digi[2].tdc(), digi[3].tdc(), digi[4].tdc(), digi[5].tdc(), did.ieta(), did.iphi(), did.depth(), TCharge, TADC);
 
   }
 
