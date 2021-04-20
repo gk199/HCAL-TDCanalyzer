@@ -15,7 +15,7 @@ scram b -j 8
 ```
 
 ## 2018 HE: HcalDigiAnalyzer
-Starting from 2018D Isolated Bunch files (`/store/data/Run2018D/IsolatedBunch/RAW`, [DAS link](https://cmsweb.cern.ch/das/request?instance=prod/global&input=file+dataset%3D%2FIsolatedBunch%2FRun2018D-v1%2FRAW)), the ones with a valid events are listed in `MyAnalyzer/python/ConfFile_cfg.py`. To run over these, do `cmsRun python/ConfFile_*_cfg.py`, or submit Condor jobs. This is done with
+Starting from 2018 Isolated Bunch files (`/store/data/Run2018D/IsolatedBunch/RAW`, [2018D DAS link](https://cmsweb.cern.ch/das/request?instance=prod/global&input=file+dataset%3D%2FIsolatedBunch%2FRun2018D-v1%2FRAW); or `/store/data/Run2018A/IsolatedBunch/RAW`, [2018A DAS link](https://cmsweb.cern.ch/das/request?instance=prod/global&input=file+dataset%3D%2FIsolatedBunch%2FRun2018A-v1%2FRAW)), the ones with a valid events are listed in `MyAnalyzer/python/ConfFile_*_cfg.py`. To run over these, do `cmsRun python/ConfFile_*_cfg.py`, or submit Condor jobs. This is done with
 ```
 voms-proxy-init --rfc --voms cms --valid 48:00
 cp /tmp/x509up_u101898 /afs/cern.ch/user/g/gkopp
