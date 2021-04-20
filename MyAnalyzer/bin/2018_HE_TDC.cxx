@@ -23,14 +23,14 @@
 #include "DataFormats/HcalRecHit/interface/HBHERecHit.h"
 
 int main(int argc, char *argv[]) {
-  TFile *f = new TFile("/afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/IsoBunch_Run2018A.root");
+  TFile *f = new TFile("/afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/IsoBunch_Run2018A_bx.root");
 
   TTreeReader myReader("MyAnalyzer/qiedigi",f);
 
   TTreeReaderValue<Float_t> Run(myReader, "RunNum");
   TTreeReaderValue<Float_t> Lumi(myReader, "LumiNum");
   TTreeReaderValue<Float_t> Event(myReader, "EvtNum");
-  TTreeReaderValue<Float_t> BunchX(myReader, "BunchCorssing");
+  TTreeReaderValue<Float_t> BunchX(myReader, "BunchCrossing");
   TTreeReaderValue<Float_t> ADC(myReader, "ADC");
   TTreeReaderValue<Float_t> Charge(myReader, "Charge");
   TTreeReaderValue<Float_t> TDC1(myReader, "TDC1");
@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
       }
     }
   }
-  std::cout << partial_sum[0][1][50] << std::endl;
+  //  std::cout << partial_sum[0][1][50] << std::endl;
 
   int bkg90[30][8] = {{0}};
   for (int eta = 0; eta < 30; eta++) {
@@ -136,7 +136,7 @@ int main(int argc, char *argv[]) {
       for (int tdc = 0; tdc<=50; tdc++) {
 	cumulative_frac[eta][depth][tdc] = (double) ( partial_sum[eta][depth][tdc] / partial_sum[eta][depth][50] );
 	if (cumulative_frac[eta][depth][tdc] > 0.9 && bkg90[eta][depth] == 0 ) bkg90[eta][depth] = tdc;
-	if (eta == 16 && depth == 5) std::cout << cumulative_frac[eta][depth][tdc] << " depth 2 at TDC = " << tdc << " with ps = " << partial_sum[eta][depth][tdc] << std::endl;
+	//	if (eta == 16 && depth == 5) std::cout << cumulative_frac[eta][depth][tdc] << " depth 2 at TDC = " << tdc << " with ps = " << partial_sum[eta][depth][tdc] << std::endl;
       }
     }
   }
