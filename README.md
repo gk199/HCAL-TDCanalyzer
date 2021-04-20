@@ -1,19 +1,38 @@
 # HCAL TDC and Extended Bits Analyzers
 This code is used for looking at TDC data from 2018 HE runs, and 2021 MWGRs with packed TDC values and extended bits in HB. Details for each approach are below:
 
+## Setup
+Setup a CMSSW environment, an example below:
+```
+cmsrel CMSSW_11_2_0
+cd CMSSW_11_2_0/src
+cmsenv
+
+git clone git@github.com:gk199/HCAL-TDCanalyzer.git
+cd MyAnalyzer
+cmsenv
+scram b -j 8
+```
+
 ## 2018 HE: HcalDigiAnalyzer
-Starting from 2018D Isolated Bunch files (`/store/data/Run2018D/IsolatedBunch/RAW`, [DAS link](https://cmsweb.cern.ch/das/request?instance=prod/global&input=file+dataset%3D%2FIsolatedBunch%2FRun2018D-v1%2FRAW)), the ones with a valid events are listed in `/MyAnalyzer/python/ConfFile_cfg.py`. To run over these, can do `cmsRun python/ConfFile_cfg.py`, or submit Condor jobs. This is done with
+Starting from 2018D Isolated Bunch files (`/store/data/Run2018D/IsolatedBunch/RAW`, [DAS link](https://cmsweb.cern.ch/das/request?instance=prod/global&input=file+dataset%3D%2FIsolatedBunch%2FRun2018D-v1%2FRAW)), the ones with a valid events are listed in `MyAnalyzer/python/ConfFile_cfg.py`. To run over these, do `cmsRun python/ConfFile_*_cfg.py`, or submit Condor jobs. This is done with
 ```
 voms-proxy-init --rfc --voms cms --valid 48:00
 cp /tmp/x509up_u101898 /afs/cern.ch/user/g/gkopp
 chmod 777 /afs/cern.ch/user/g/gkopp/x509up_u101898
 kinit
-condor_submit condor_IsoBunch.sub
+condor_submit condor_IsoBunch_*.sub
 condor_q --nobatch
 ```
-This will then run the hcalDigis task to get the TDC info from the RAW data. In `MyAnalyzer/plugins/MyAnalyzer.cc`, the QIE11 digis are accessed. The TDC value for each TS is reported, and the pulse shape is integrated to report the charge and ADC of the full digi pulse. An ntuple `IsoBunch_Run2018D.root` is created, with the branches holding the TDC and charge info, which can be changed by editing `MyAnalyzer.cc`.
+This will then run the hcalDigis task to get the TDC info from the RAW data. In `MyAnalyzer/plugins/MyAnalyzer.cc`, the QIE11 digis are accessed. The TDC value for each TS is reported (with digi[3].tdc() from the SOI, and saved as TDC1), and the pulse shape is integrated to report the charge and ADC of the full digi pulse. An ntuple `IsoBunch_Run2018*.root` is created, with the branches holding the TDC and charge info, which can be changed by editing `MyAnalyzer.cc`. Bunch crossing number is also included.
 
-To plot the TDC per depth and per ieta, use `MyAnalyzer/bin/2018_HE_TDC.cxx`, and run with `2018_HE_TDC.exe`. This outputs a pdf plot of the TDC distribution per depth. Some of this above code has been adapted from the analyzer by Long Wang. 
+To plot the TDC per depth and per ieta, edit `MyAnalyzer/bin/2018_HE_TDC.cxx`, and run with 
+```
+cmsenv
+scram b -j 8
+2018_HE_TDC.exe
+```
+Some of this above code has been adapted from the analyzer by Long Wang. This plots the TDC distribution (for pulses above about 3GeV) by ieta and depth, and also does the background 90% calculation (for pulses above 2GeV).
 
 ## MWGR Extended Bits
 Using `Debug/HcalDebug/plugins/AnalyzeTP.cc`, this places the extended bits in the tps tree after accessing the TP digis. Check that in `python/customize.py`, AnalyzeTP.cc is listed in line 48, a few lines after `def analyze_tp(process, name, tag1):`.  Run this using `test/one_run.py`, and list the relevant runs to consider, along with the dataset information. This will output a python config file -- if only a portion of the run is needed, this can be edited to only use specific files.
