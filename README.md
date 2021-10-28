@@ -35,7 +35,7 @@ scram b -j 8
 Some of this above code has been adapted from the analyzer by Long Wang. This plots the TDC distribution (for pulses above about 3GeV) by ieta and depth, and also does the background 90% calculation (for pulses above 2GeV).
 
 ### Run 3 MC
-Similar plots were made in Run 3 MC on QCD samples, which is done here: `/afs/cern.ch/work/g/gkopp/HCAL_Trigger/L1Ntuples/HCAL_TP_TimingBitEmulator/CMSSW_11_2_0/src/HcalTrigger/Validation` with the script `bin/rates_FineGrain.cxx`.
+Similar plots were made in Run 3 MC on QCD samples, which is done here: `/afs/cern.ch/work/g/gkopp/HCAL_Trigger/L1Ntuples/HCAL_TP_TimingBitEmulator/CMSSW_11_2_0/src/HcalTrigger/Validation` with the script `bin/rates_FineGrain.cxx`. This is run with `rates_bkgTDCdist.exe new QCD_PU_18pt7 3 3` where the arguments are HB and HE energy requirements to plot. This script is also used to determine 90\% values for background samples.
 
 ## MWGR Extended Bits
 Using `Debug/HcalDebug/plugins/AnalyzeTP.cc`, this places the extended bits in the tps tree after accessing the TP digis. Check that in `python/customize.py`, AnalyzeTP.cc is listed in line 48, a few lines after `def analyze_tp(process, name, tag1):`.  Run this using `test/one_run.py`, and list the relevant runs to consider, along with the dataset information. This will output a python config file -- if only a portion of the run is needed, this can be edited to only use specific files.
