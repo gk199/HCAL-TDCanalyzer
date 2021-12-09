@@ -4,12 +4,14 @@
 #include "TTreeReader.h"
 #include "TTreeReaderValue.h"
 #include "TGraph.h"
+#include "TEfficiency.h"
 #include "TCanvas.h"
 #include "TStyle.h"
 #include "TColor.h"
 #include "TLegend.h"
 #include "TChain.h"
 #include "TROOT.h"
+#include "TGraphAsymmErrors.h"
 
 #include <iostream>
 #include <fstream>
@@ -23,14 +25,14 @@
 #include "DataFormats/HcalRecHit/interface/HBHERecHit.h"
 
 int main(int argc, char *argv[]) {
-  TFile *f = new TFile("/afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/IsoBunch_Run2018A_bx.root");
+  TFile *f = new TFile("/afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/IsoBunch_Run2018A.root");
 
   TTreeReader myReader("MyAnalyzer/qiedigi",f);
 
   TTreeReaderValue<Float_t> Run(myReader, "RunNum");
   TTreeReaderValue<Float_t> Lumi(myReader, "LumiNum");
   TTreeReaderValue<Float_t> Event(myReader, "EvtNum");
-  TTreeReaderValue<Float_t> BunchX(myReader, "BunchCrossing");
+  //  TTreeReaderValue<Float_t> BunchX(myReader, "BunchCrossing");
   TTreeReaderValue<Float_t> ADC(myReader, "ADC");
   TTreeReaderValue<Float_t> Charge(myReader, "Charge");
   TTreeReaderValue<Float_t> TDC0(myReader, "TDC0"); // SOI-1 
@@ -38,6 +40,9 @@ int main(int argc, char *argv[]) {
   TTreeReaderValue<Float_t> iEta(myReader, "IEta");
   TTreeReaderValue<Float_t> iPhi(myReader, "IPhi");
   TTreeReaderValue<Float_t> Depth(myReader, "Depth");
+
+  TH1F *HE62 = new TH1F("HE62","Error Code 62 Rate in HE, 2018A;Depth;Rate of TDC=62",8,0,8);
+  TH1F *HE = new TH1F("HE","Error Code 62 Rate in HE, 2018A;Depth;Rate of TDC=62",8,0,8);
 
   std::map<int, TH1F*> depth_all_ieta; // histogram for TDC at each depth
   std::map<int, TH1F*> depth_all_ieta_tdc0;
@@ -71,7 +76,8 @@ int main(int argc, char *argv[]) {
       depth_by_ieta_tdc0[*Depth][abs(*iEta)]->Fill(*TDC0);
     }
     if ( *ADC > 33) eta_depth_tdc[static_cast<int>(abs(*iEta))][static_cast<int>(*Depth)][static_cast<int>(*TDC1)] += 1; // at each ieta, depth, count how many cells with TDC of each value
-
+    if (*TDC1 == 62) HE62->Fill(*Depth);
+    HE->Fill(*Depth);
     if (evtCounter < 100000) {
       TDC_graph[evtCounter] = static_cast<int>(*TDC1);
       ADC_graph[evtCounter] = static_cast<int>(*Charge);
@@ -79,6 +85,21 @@ int main(int argc, char *argv[]) {
 
     evtCounter++;
   }
+
+  // HE TDC = 62 rate plots
+  TCanvas *cHE = new TCanvas();
+  if (TEfficiency::CheckConsistency(*HE62,*HE)) {
+    TEfficiency *effHE = new TEfficiency(*HE62,*HE);
+    effHE->SetTitle("Error Code TDC=62 Rates in HE, 2018A data");
+    effHE->SetLineWidth(3.);
+    effHE->SetLineColor(kBlack);
+    effHE->Draw();
+    gPad->Update();
+    effHE->GetPaintedGraph()->SetMaximum(0.45);
+    effHE->GetPaintedGraph()->SetMinimum(0.);
+    gPad->Update();
+  }
+  cHE->SaveAs("2018A_plots/HE_TDCerror62_2018A.png");
 
   // ADC vs TDC plot
   TGraph *gr_adc = new TGraph(100000, ADC_graph, TDC_graph);
@@ -89,12 +110,12 @@ int main(int argc, char *argv[]) {
   gr_adc->Draw("AP");
   gr_adc->SetMarkerStyle(20);
   gr_adc->SetMarkerSize(0.5);
-  c1_adc->SaveAs(Form("TDC_vs_ADC_full_2018A.png")); 
+  c1_adc->SaveAs(Form("2018A_plots/TDC_vs_ADC_full_2018A.png")); 
   gr_adc->SetMaximum(30);
   gr_adc->SetMinimum(0);
   gr_adc->GetXaxis()->SetLimits(0,200);
   gr_adc->Draw("P");
-  c1_adc->SaveAs(Form("TDC_vs_ADC_2018A.png")); 
+  c1_adc->SaveAs(Form("2018A_plots/TDC_vs_ADC_2018A.png")); 
 
   TCanvas* c2 = new TCanvas("c2","TDC Distribution, 2018A",0,0,400,300);
   //  gStyle->SetOptStat(0);
