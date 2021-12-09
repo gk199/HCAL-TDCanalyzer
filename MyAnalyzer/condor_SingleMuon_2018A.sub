@@ -1,0 +1,11 @@
+executable            = runjobs.sh
+Proxy_path            = /afs/cern.ch/user/g/gkopp/x509up_u101898
+arguments             = $(Proxy_path) /afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/python/ConfFile_SingleMuon2018A_cfg.py
+output                = /afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/out/SingleMuon_2018A.out
+error                 = /afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/error/SingleMuon_2018A.err
+log                   = /afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/log/SingleMuon_2018A.log
+
++JobFlavour = "testmatch"
+RequestCpus = 4
+
+queue
