@@ -26,6 +26,7 @@
 
 int main(int argc, char *argv[]) {
   TFile *f = new TFile("/afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/IsoBunch_Run2018A.root");
+  //  TFile *f = new TFile("/afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/SingleMuon_Run2018A.root");
 
   TTreeReader myReader("MyAnalyzer/qiedigi",f);
 
@@ -76,8 +77,10 @@ int main(int argc, char *argv[]) {
       depth_by_ieta_tdc0[*Depth][abs(*iEta)]->Fill(*TDC0);
     }
     if ( *ADC > 33) eta_depth_tdc[static_cast<int>(abs(*iEta))][static_cast<int>(*Depth)][static_cast<int>(*TDC1)] += 1; // at each ieta, depth, count how many cells with TDC of each value
-    if (*TDC1 == 62) HE62->Fill(*Depth);
-    HE->Fill(*Depth);
+    if (abs(*iEta) >= 16) {
+      if (*TDC1 == 62) HE62->Fill(*Depth);
+      HE->Fill(*Depth);
+    }
     if (evtCounter < 100000) {
       TDC_graph[evtCounter] = static_cast<int>(*TDC1);
       ADC_graph[evtCounter] = static_cast<int>(*Charge);
@@ -95,8 +98,14 @@ int main(int argc, char *argv[]) {
     effHE->SetLineColor(kBlack);
     effHE->Draw();
     gPad->Update();
-    effHE->GetPaintedGraph()->SetMaximum(0.45);
+    effHE->GetPaintedGraph()->SetMaximum(0.0005);
     effHE->GetPaintedGraph()->SetMinimum(0.);
+    gPad->Update();
+    cHE->SaveAs("2018A_plots/HE_TDCerror62_zoom2_2018A.png");
+    effHE->GetPaintedGraph()->SetMaximum(0.005);
+    cHE->SaveAs("2018A_plots/HE_TDCerror62_zoom_2018A.png");
+    gPad->Update();
+    effHE->GetPaintedGraph()->SetMaximum(0.05);
     gPad->Update();
   }
   cHE->SaveAs("2018A_plots/HE_TDCerror62_2018A.png");
