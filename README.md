@@ -53,6 +53,17 @@ This is taken from the [HCAL debug framework](https://github.com/gk199/cms-hcal-
 
 Ideally we'd like to cross-correlate this with the fine-grain bits, but the current MWGR used don't have HB values processed. This approach uses MWGR cosmics [RAW data](https://cmsweb.cern.ch/das/request?input=file+dataset%3D%2FCosmics%2FCommissioning2021-v1%2FRAW&instance=prod/global&amp;idx=50&&amp;limit=50).
 
+### HCAL LED / QIE Raw Data
+In `/afs/cern.ch/work/g/gkopp/MWGR/CMSSW_12_1_0_pre4/src/Debug/HcalDebug/` use:
+```
+cd /afs/cern.ch/work/g/gkopp/MWGR/CMSSW_12_1_0_pre4/src/Debug/HcalDebug/
+./one_run.py -r 346603 -t local 
+cmsRun analyze_2021_tp_data_346603.py
+```
+Where the run number of the LED run (from the elog, or the HCAL Ops gitlab issue) is listed as an argument. Then can see the 6 fine grain bits (if group 0 LUT is updated). 
+
+Much of the raw TDC information analysis is done in [HCAL raw data analysis](https://github.com/gk199/P5_HCAL_RawData).
+
 ## MWGR TDC -- fine grain bits
 Starting from the MWGR Cosmics run (as above, but now using the [RAW-RECO data](https://cmsweb.cern.ch/das/request?instance=prod/global&input=file+dataset%3D%2FCosmics%2FCommissioning2021-CosmicTP-PromptReco-v1%2FRAW-RECO)), the TDC fine grain bits can be looked at. This is done in `HcalDigiAnalyzer-2018RAW/MyAnalyzer/bin/RechHit.cxx` and `RechHit.exe`, where the TDC value (packed in HB, so is 0, 1, 2, or 3; or 0-63 in HE), time slice, event, and ieta are printed out. 
 
