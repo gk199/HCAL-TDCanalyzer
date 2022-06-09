@@ -70,6 +70,7 @@ private:
   // ----------member data ---------------------------
   edm::EDGetTokenT<HBHERecHitCollection> hcalRecHitsToken_;
   edm::EDGetTokenT<QIE11DigiCollection> qie11digisToken_;
+  edm::ESGetToken<HcalDbService, HcalDbRecord> hcalDbServiceToken_;
 
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
   edm::ESGetToken<SetupData, SetupRecord> setupToken_;
@@ -91,6 +92,7 @@ private:
 //
 MyAnalyzer::MyAnalyzer(const edm::ParameterSet& iConfig)
    //:  hcalRecHitsToken_ (consumes<HBHERecHitCollection>(iConfig.getUntrackedParameter<edm::InputTag>("tagRecHit"))),
+   :   hcalDbServiceToken_ (esConsumes<HcalDbService, HcalDbRecord, edm::Transition::BeginRun>()),
    :   qie11digisToken_ (consumes<QIE11DigiCollection>(iConfig.getUntrackedParameter<edm::InputTag>("tagQIE11", edm::InputTag("hcalDigis")))) {
 
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
@@ -102,7 +104,6 @@ MyAnalyzer::MyAnalyzer(const edm::ParameterSet& iConfig)
   edm::Service<TFileService> fs;
   tup_rh = fs->make<TNtuple>("rechit", "rechit", "RunNum:LumiNum:EvtNum:Energy:Time:TDC0:TDC1:TDC2:TDC3:TDC4:IEta:IPhi:Depth");
   tup_qie= fs->make<TNtuple>("qiedigi", "qiedigi", "RunNum:LumiNum:EvtNum:BunchCrossing:ADC:Charge:TDC0:TDC1:TDC2:TDC3:IEta:IPhi:Depth:TCharge:TADC");
-
 }
 
 MyAnalyzer::~MyAnalyzer() {
@@ -125,8 +126,9 @@ void MyAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
   long lumiid  = iEvent.id().luminosityBlock();
   long bunchx  = iEvent.bunchCrossing();
 
-  edm::ESHandle<HcalDbService> conditions;
-  iSetup.get<HcalDbRecord>().get(conditions);
+  //  edm::ESHandle<HcalDbService> conditions;
+  //  iSetup.get<HcalDbRecord>().get(conditions); // this is obsolete, replaced by below line and hcalDbServiceToken initialized above
+  edm::ESHandle<HcalDbService> conditions = iSetup.getHandle(hcalDbServiceToken_);
 
   //edm::Handle<HBHERecHitCollection> hcalRecHits;
   edm::Handle<QIE11DigiCollection> qie11Digis;
