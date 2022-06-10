@@ -25,7 +25,8 @@
 #include "DataFormats/HcalRecHit/interface/HBHERecHit.h"
 
 int main(int argc, char *argv[]) {
-  TFile *f = new TFile("/afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/IsoBunch_Run2018A.root");
+  TFile *f = new TFile("/afs/cern.ch/work/g/gkopp/MWGR/900GeV/CMSSW_12_3_4_patch2/src/HCAL-TDCanalyzer/MyAnalyzer/900gev_QIEscan_2022.root");
+  //  TFile *f = new TFile("/afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/IsoBunch_Run2018A.root");
   //  TFile *f = new TFile("/afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW/MyAnalyzer/SingleMuon_Run2018A.root");
 
   TTreeReader myReader("MyAnalyzer/qiedigi",f);
@@ -42,8 +43,10 @@ int main(int argc, char *argv[]) {
   TTreeReaderValue<Float_t> iPhi(myReader, "IPhi");
   TTreeReaderValue<Float_t> Depth(myReader, "Depth");
 
-  TH1F *HE62 = new TH1F("HE62","Error Code 62 Rate in HE, 2018A;Depth;Rate of TDC=62",8,0,8);
-  TH1F *HE = new TH1F("HE","Error Code 62 Rate in HE, 2018A;Depth;Rate of TDC=62",8,0,8);
+  TH1F *HE62 = new TH1F("HE62","Error Code 62 Rate in HE, 2022 900 GeV;Depth;Rate of TDC=62",8,0,8);
+  TH1F *HE = new TH1F("HE","Error Code 62 Rate in HE, 2022 900 GeV;Depth;Rate of TDC=62",8,0,8);
+  TH1F *HB3 = new TH1F("HB3","Error Code 3 Rate in HB, 2022 900 GeV;Depth;Rate of TDC=3",5,0,5);
+  TH1F *HB = new TH1F("HB","Error Code 3 Rate in HB, 2022 900 GeV;Depth;Rate of TDC=3",5,0,5);
 
   std::map<int, TH1F*> depth_all_ieta; // histogram for TDC at each depth
   std::map<int, TH1F*> depth_all_ieta_tdc0;
@@ -81,6 +84,10 @@ int main(int argc, char *argv[]) {
       if (*TDC1 == 62) HE62->Fill(*Depth);
       HE->Fill(*Depth);
     }
+    if (abs(*iEta) < 16) {
+      if (*TDC1 == 3) HB3->Fill(*Depth);
+      HB->Fill(*Depth);
+    }
     if (evtCounter < 100000) {
       TDC_graph[evtCounter] = static_cast<int>(*TDC1);
       ADC_graph[evtCounter] = static_cast<int>(*Charge);
@@ -93,7 +100,7 @@ int main(int argc, char *argv[]) {
   TCanvas *cHE = new TCanvas();
   if (TEfficiency::CheckConsistency(*HE62,*HE)) {
     TEfficiency *effHE = new TEfficiency(*HE62,*HE);
-    effHE->SetTitle("Error Code TDC=62 Rates in HE, 2018A data");
+    effHE->SetTitle("Error Code TDC=62 Rates in HE, 2022 900 GeV data");
     effHE->SetLineWidth(3.);
     effHE->SetLineColor(kBlack);
     effHE->Draw();
@@ -101,32 +108,53 @@ int main(int argc, char *argv[]) {
     effHE->GetPaintedGraph()->SetMaximum(0.0005);
     effHE->GetPaintedGraph()->SetMinimum(0.);
     gPad->Update();
-    cHE->SaveAs("2018A_plots/HE_TDCerror62_zoom2_2018A.png");
+    cHE->SaveAs("2022_plots/HE_TDCerror62_zoom2_2022_900gev.png");
     effHE->GetPaintedGraph()->SetMaximum(0.005);
-    cHE->SaveAs("2018A_plots/HE_TDCerror62_zoom_2018A.png");
+    cHE->SaveAs("2022_plots/HE_TDCerror62_zoom_2022_900gev.png");
     gPad->Update();
     effHE->GetPaintedGraph()->SetMaximum(0.05);
     gPad->Update();
   }
-  cHE->SaveAs("2018A_plots/HE_TDCerror62_2018A.png");
+  cHE->SaveAs("2022_plots/HE_TDCerror62_2022_900gev.png");
+
+  // HB TDC = 3 rate plots
+  TCanvas *cHB = new TCanvas();
+  if (TEfficiency::CheckConsistency(*HB3,*HB)) {
+    TEfficiency *effHB = new TEfficiency(*HB3,*HB);
+    effHB->SetTitle("Error Code TDC=3 Rates in HB, 2022 900 GeV data");
+    effHB->SetLineWidth(3.);
+    effHB->SetLineColor(kBlack);
+    effHB->Draw();
+    gPad->Update();
+    effHB->GetPaintedGraph()->SetMaximum(0.0005);
+    effHB->GetPaintedGraph()->SetMinimum(0.);
+    gPad->Update();
+    cHB->SaveAs("2022_plots/HB_TDCerror3_zoom2_2022_900gev.png");
+    effHB->GetPaintedGraph()->SetMaximum(0.005);
+    cHB->SaveAs("2022_plots/HB_TDCerror3_zoom_2022_900gev.png");
+    gPad->Update();
+    effHB->GetPaintedGraph()->SetMaximum(0.05);
+    gPad->Update();
+  }
+  cHB->SaveAs("2022_plots/HB_TDCerror3_2022_900gev.png");
 
   // ADC vs TDC plot
   TGraph *gr_adc = new TGraph(100000, ADC_graph, TDC_graph);
   TCanvas *c1_adc = new TCanvas();
-  gr_adc->SetTitle(Form("Charge (fC) vs TDC, 2018A"));
+  gr_adc->SetTitle(Form("Charge (fC) vs TDC, 2022 900 GeV"));
   gr_adc->GetYaxis()->SetTitle("TDC value, 0.5 ns steps");
   gr_adc->GetXaxis()->SetTitle("Charge in fC, 7k fC = 3 GeV");
   gr_adc->Draw("AP");
   gr_adc->SetMarkerStyle(20);
   gr_adc->SetMarkerSize(0.5);
-  c1_adc->SaveAs(Form("2018A_plots/TDC_vs_ADC_full_2018A.png")); 
+  c1_adc->SaveAs(Form("2022_plots/TDC_vs_ADC_full_2022_900gev.png")); 
   gr_adc->SetMaximum(30);
   gr_adc->SetMinimum(0);
   gr_adc->GetXaxis()->SetLimits(0,200);
   gr_adc->Draw("P");
-  c1_adc->SaveAs(Form("2018A_plots/TDC_vs_ADC_2018A.png")); 
+  c1_adc->SaveAs(Form("2022_plots/TDC_vs_ADC_2022_900gev.png")); 
 
-  TCanvas* c2 = new TCanvas("c2","TDC Distribution, 2018A",0,0,400,300);
+  TCanvas* c2 = new TCanvas("c2","TDC Distribution, 2022 900 GeV",0,0,400,300);
   //  gStyle->SetOptStat(0);
   TLegend* leg = new TLegend(0.5,0.6,0.9,0.9);
   depth_all_ieta[1]->Draw();
@@ -138,16 +166,16 @@ int main(int argc, char *argv[]) {
       leg->AddEntry(depth_all_ieta[depth],Form("HE Depth %d, mean = %.2f",depth,depth_all_ieta[depth]->GetMean()));
     }
   leg->Draw("same");
-  depth_all_ieta[1]->SetTitle("TDC Distribution, 2018A");   
+  depth_all_ieta[1]->SetTitle("TDC Distribution, 2022 900 GeV");   
   depth_all_ieta[1]->GetXaxis()->SetTitle("TDC value in SOI, 1/2 ns steps");
   depth_all_ieta[1]->GetYaxis()->SetTitle("Entries");
 
-  c2->SaveAs("2018A_plots/TDC_by_depth.pdf");
+  c2->SaveAs("2022_plots/TDC_by_depth.pdf");
   c2->SetLogy();
-  c2->SaveAs("2018A_plots/TDC_by_depth_log.pdf");
+  c2->SaveAs("2022_plots/TDC_by_depth_log.pdf");
 
   // soi-1 
-  TCanvas* c2_tdc0 = new TCanvas("c2_tdc0","SOI-1 TDC Distribution, 2018A",0,0,400,300);
+  TCanvas* c2_tdc0 = new TCanvas("c2_tdc0","SOI-1 TDC Distribution, 2022 900 GeV",0,0,400,300);
   TLegend* leg_tdc0 = new TLegend(0.1,0.6,0.5,0.9);
   depth_all_ieta_tdc0[1]->Draw();
   for (int depth = 1; depth <= 7; depth++)
@@ -157,15 +185,15 @@ int main(int argc, char *argv[]) {
       leg_tdc0->AddEntry(depth_all_ieta_tdc0[depth],Form("HE Depth %d, mean = %.2f",depth,depth_all_ieta_tdc0[depth]->GetMean()));
     }
   leg_tdc0->Draw("same");
-  depth_all_ieta_tdc0[1]->SetTitle("SOI-1 TDC Distribution, 2018A");
+  depth_all_ieta_tdc0[1]->SetTitle("SOI-1 TDC Distribution, 2022 900 GeV");
   depth_all_ieta_tdc0[1]->GetXaxis()->SetTitle("TDC value in SOI-1, 1/2 ns steps");
   depth_all_ieta_tdc0[1]->GetYaxis()->SetTitle("Entries");
-  c2_tdc0->SaveAs("2018A_plots/TDC_by_depth_tdc0.pdf");
+  c2_tdc0->SaveAs("2022_plots/TDC_by_depth_tdc0.pdf");
   c2_tdc0->SetLogy();
-  c2_tdc0->SaveAs("2018A_plots/TDC_by_depth_log_tdc0.pdf");
+  c2_tdc0->SaveAs("2022_plots/TDC_by_depth_log_tdc0.pdf");
 
   // soi-1 and soi
-  TCanvas* c2_tdc01 = new TCanvas("c2_tdc01","SOI-1 TDC Distribution, 2018A",0,0,400,300);
+  TCanvas* c2_tdc01 = new TCanvas("c2_tdc01","SOI-1 TDC Distribution, 2022 900 GeV",0,0,400,300);
   TLegend* leg_tdc01 = new TLegend(0.1,0.6,0.48,0.9);
   depth_all_ieta_tdc01[1]->Draw();
   for (int depth = 1; depth <= 7; depth++)
@@ -175,14 +203,14 @@ int main(int argc, char *argv[]) {
       leg_tdc01->AddEntry(depth_all_ieta_tdc01[depth],Form("HE Depth %d, mean = %.2f",depth,depth_all_ieta_tdc01[depth]->GetMean()));
     }
   leg_tdc01->Draw("same");
-  depth_all_ieta_tdc01[1]->SetTitle("SOI-1 and SOI TDC Distribution, 2018A");
+  depth_all_ieta_tdc01[1]->SetTitle("SOI-1 and SOI TDC Distribution, 2022 900 GeV");
   depth_all_ieta_tdc01[1]->GetXaxis()->SetTitle("TDC value in SOI-1 and SOI, 1/2 ns steps");
   depth_all_ieta_tdc01[1]->GetYaxis()->SetTitle("Entries");
-  c2_tdc01->SaveAs("2018A_plots/TDC_by_depth_tdc01.pdf");
+  c2_tdc01->SaveAs("2022_plots/TDC_by_depth_tdc01.pdf");
   c2_tdc01->SetLogy();
-  c2_tdc01->SaveAs("2018A_plots/TDC_by_depth_log_tdc01.pdf");
+  c2_tdc01->SaveAs("2022_plots/TDC_by_depth_log_tdc01.pdf");
 
-  TCanvas* c3 = new TCanvas("c3","TDC Distribution, 2018A",0,0,400,300);
+  TCanvas* c3 = new TCanvas("c3","TDC Distribution, 2022 900 GeV",0,0,400,300);
   gStyle->SetOptStat(0);
   TLegend* leg2 = new TLegend(0.5,0.6,0.9,0.9);
   for (int ieta = 16; ieta < 30; ieta++) {
@@ -196,7 +224,7 @@ int main(int argc, char *argv[]) {
 	leg2->AddEntry(depth_by_ieta[depth][ieta],Form("HE Depth %d, mean = %.2f",depth,depth_by_ieta[depth][ieta]->GetMean()));
       }
     leg2->Draw("same");
-    depth_by_ieta[1][ieta]->SetTitle(Form("TDC Distribution at ieta = %d, 2018A (7k+ fC)",ieta));
+    depth_by_ieta[1][ieta]->SetTitle(Form("TDC Distribution at ieta = %d, 2022 900 GeV (7k+ fC)",ieta));
     depth_by_ieta[1][ieta]->GetXaxis()->SetTitle("TDC value in SOI, 1/2 ns steps");
     depth_by_ieta[1][ieta]->GetYaxis()->SetTitle("Entries");
     if (ieta == 16) {
@@ -209,16 +237,16 @@ int main(int argc, char *argv[]) {
       depth_by_ieta[2][ieta]->GetXaxis()->SetTitle("TDC value in SOI, 1/2 ns steps");
       depth_by_ieta[2][ieta]->GetYaxis()->SetTitle("Entries");    
     }
-    c3->SaveAs(Form("2018A_plots/TDC_by_depth_ieta%d.pdf",ieta));
+    c3->SaveAs(Form("2022_plots/TDC_by_depth_ieta%d.pdf",ieta));
     c3->SetLogy();
-    c3->SaveAs(Form("2018A_plots/TDC_by_depth_ieta%d_log.pdf",ieta));
+    c3->SaveAs(Form("2022_plots/TDC_by_depth_ieta%d_log.pdf",ieta));
     c3->Clear();
     c3->SetLogy(0);
     leg2->Clear();
   }
 
 
-  TCanvas* c3_tdc0 = new TCanvas("c3_tdc0","TDC Distribution, 2018A",0,0,400,300);
+  TCanvas* c3_tdc0 = new TCanvas("c3_tdc0","TDC Distribution, 2022 900 GeV",0,0,400,300);
   gStyle->SetOptStat(0);
   TLegend* leg2_tdc0 = new TLegend(0.1,0.6,0.5,0.9);
   for (int ieta = 16; ieta < 30; ieta++) {
@@ -232,7 +260,7 @@ int main(int argc, char *argv[]) {
         leg2_tdc0->AddEntry(depth_by_ieta_tdc0[depth][ieta],Form("HE Depth %d, mean = %.2f",depth,depth_by_ieta_tdc0[depth][ieta]->GetMean()));
       }
     leg2_tdc0->Draw("same");
-    depth_by_ieta_tdc0[1][ieta]->SetTitle(Form("SOI-1 TDC Distribution at ieta = %d, 2018A (7k+ fC)",ieta));
+    depth_by_ieta_tdc0[1][ieta]->SetTitle(Form("SOI-1 TDC Distribution at ieta = %d, 2022 900 GeV (7k+ fC)",ieta));
     depth_by_ieta_tdc0[1][ieta]->GetXaxis()->SetTitle("TDC value in SOI-1, 1/2 ns steps");
     depth_by_ieta_tdc0[1][ieta]->GetYaxis()->SetTitle("Entries");
     if (ieta == 16) {
@@ -245,9 +273,9 @@ int main(int argc, char *argv[]) {
       depth_by_ieta_tdc0[2][ieta]->GetXaxis()->SetTitle("TDC value in SOI-1, 1/2 ns steps");
       depth_by_ieta_tdc0[2][ieta]->GetYaxis()->SetTitle("Entries");
     }
-    c3_tdc0->SaveAs(Form("2018A_plots/TDC_by_depth_ieta%d_tdc0.pdf",ieta));
+    c3_tdc0->SaveAs(Form("2022_plots/TDC_by_depth_ieta%d_tdc0.pdf",ieta));
     c3_tdc0->SetLogy();
-    c3_tdc0->SaveAs(Form("2018A_plots/TDC_by_depth_ieta%d_log_tdc0.pdf",ieta));
+    c3_tdc0->SaveAs(Form("2022_plots/TDC_by_depth_ieta%d_log_tdc0.pdf",ieta));
     c3_tdc0->Clear();
     c3_tdc0->SetLogy(0);
     leg2_tdc0->Clear();

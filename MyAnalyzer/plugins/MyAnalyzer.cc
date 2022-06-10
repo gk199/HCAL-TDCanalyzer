@@ -91,10 +91,10 @@ private:
 // constructors and destructor
 //
 MyAnalyzer::MyAnalyzer(const edm::ParameterSet& iConfig)
-   //:  hcalRecHitsToken_ (consumes<HBHERecHitCollection>(iConfig.getUntrackedParameter<edm::InputTag>("tagRecHit"))),
-   :   hcalDbServiceToken_ (esConsumes<HcalDbService, HcalDbRecord, edm::Transition::BeginRun>()),
-   :   qie11digisToken_ (consumes<QIE11DigiCollection>(iConfig.getUntrackedParameter<edm::InputTag>("tagQIE11", edm::InputTag("hcalDigis")))) {
-
+  //:  hcalRecHitsToken_ (consumes<HBHERecHitCollection>(iConfig.getUntrackedParameter<edm::InputTag>("tagRecHit"))),
+  :   qie11digisToken_ (consumes<QIE11DigiCollection>(iConfig.getUntrackedParameter<edm::InputTag>("tagQIE11", edm::InputTag("hcalDigis")))), 
+      hcalDbServiceToken_ (esConsumes<HcalDbService, HcalDbRecord>()) {// edm::Transition::BeginRun>()) {
+  
 #ifdef THIS_IS_AN_EVENTSETUP_EXAMPLE
   setupDataToken_ = esConsumes<SetupData, SetupRecord>();
 #endif
@@ -169,6 +169,7 @@ void MyAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
 
     //	Explicit check on the DetIds present in the Collection
     HcalDetId const& did = digi.detid();
+    //    if(did.subdet() != HcalEndcap || did.subdet() != HcalBarrel) continue; // this causes HB HE TDC error code to not write
     if(did.subdet() != HcalEndcap) continue;
 
     const HcalQIECoder* channelCoder = conditions -> getHcalCoder(did);
@@ -190,6 +191,7 @@ void MyAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup
       if(it==it2) continue;
       const QIE11DataFrame digi2 = static_cast<const QIE11DataFrame>(*it2);
       HcalDetId const& did2 = digi2.detid();
+      //      if(did2.subdet() != HcalEndcap || did2.subdet() != HcalBarrel) continue;
       if(did2.subdet() != HcalEndcap) continue;
 
       const HcalQIECoder* channelCoder2 = conditions -> getHcalCoder(did2);
