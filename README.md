@@ -89,6 +89,10 @@ This work was done in `/afs/cern.ch/work/g/gkopp/L1emulator/CMSSW_12_0_0_pre5/sr
 ```
 /afs/cern.ch/work/g/gkopp/MWGR/CMSSW_11_2_2_patch1/src/HcalDigiAnalyzer-2018RAW
 ```
+The 2022 analysis work is done on
+```
+/afs/cern.ch/work/g/gkopp/MWGR/900GeV/CMSSW_12_3_4_patch2/src/HCAL-TDCanalyzer
+```
 
 ### Helpful references
 https://cmssdt.cern.ch/lxr/source/DataFormats/HcalRecHit/test/HcalRecHitDump.cc
